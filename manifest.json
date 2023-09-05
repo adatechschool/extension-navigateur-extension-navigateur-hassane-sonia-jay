@@ -1,0 +1,17 @@
+{
+  "name": "Youtube bookmarks and multi-lingual summary",
+  "version": "1.0",
+  "manifest_version": 3,
+  "description": "Add bookmarks and a summary in any language on Youtube videos",
+  "action": {
+    "default_icon": "icon-notepad.png"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["script.js"]
+    }
+  ]
+
+}
