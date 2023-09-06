@@ -1,2 +1,2 @@
 // recupérer l'url de la vidéo
-console.log(window.location);
+console.log(window.location.href);
