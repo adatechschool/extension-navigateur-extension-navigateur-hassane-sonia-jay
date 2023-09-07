@@ -34,7 +34,7 @@
         "assets/delete.png",
         "assets/save.png"
       ],
-      "matches": ["https://www.youtube.com/watch*"]
+      "matches": ["https://www.youtube.com/*"]
     }
   ]
 }
