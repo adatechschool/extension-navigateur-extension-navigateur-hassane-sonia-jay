@@ -3,15 +3,38 @@
   "version": "1.0",
   "manifest_version": 3,
   "description": "Add bookmarks and a summary in any language on Youtube videos",
+  "permissions": ["storage", "tabs"],
+  "host_permissions": ["https://www.youtube.com/watch*"],
+  "background": {
+    "service_worker": "background.js"
+  },
   "action": {
-    "default_icon": "icon-notepad.png"
+    "default_icon": {
+      "16": "assets/icon-notepad.png",
+      "24": "assets/icon-notepad.png",
+      "32": "assets/icon-notepad.png",
+      "48": "assets/icon-notepad.png"
+    },
+    "default_title": "Youtube bookmarks and multi-lingual summary",
+    "default_popup": "popup.html"
   },
 
   "content_scripts": [
     {
       "matches": ["https://www.youtube.com/watch*"],
-      "js": ["script.js"]
+      "js": ["content-script.js"]
+    }
+  ],
+
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "assets/bookmark.png",
+        "assets/play.png",
+        "assets/delete.png",
+        "assets/save.png"
+      ],
+      "matches": ["https://www.youtube.com/watch*"]
     }
   ]
-
 }
