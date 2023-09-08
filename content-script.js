@@ -2,6 +2,7 @@
   let youtubeLeftControls, youtubePlayer;
   let currentVideo = "";
   let currentVideoBookmarks = [];
+  let toto = false;
 
   const fetchBookmarks = async () => {
     const obj = await chrome.storage.sync.get([currentVideo]);
@@ -55,14 +56,26 @@
 
   chrome.runtime.onMessage.addListener((obj, sender, response) => {
     const { type, value, videoId } = obj;
-
+console.log(1);
     if (type === "NEW") {
+    
       currentVideo = videoId;
       newVideoLoaded();
-    }
+    } else if (type === "PLAY") {
+      youtubePlayer.currentTime = value;}else if ( type === "DELETE") {
+        currentVideoBookmarks = currentVideoBookmarks.filter((b) => b.time != value);
+        chrome.storage.sync.set({ [currentVideo]: JSON.stringify(currentVideoBookmarks) });
+  
+        response(currentVideoBookmarks);
+      }
   });
 
-  newVideoLoaded();
+  let trail="&ytExt=ON";
+  if(!window.location.href.includes(trail)&&!window.location.href.includes("ab_channel")&&window.location.href.includes("youtube.com/watch")){
+   
+          const new_URL = window.href+trail;
+          window.history.pushState({},"", new_URL);
+     }
 })();
 
 const getTime = (t) => {

@@ -4,7 +4,7 @@
   "manifest_version": 3,
   "description": "Add bookmarks and a summary in any language on Youtube videos",
   "permissions": ["storage", "tabs"],
-  "host_permissions": ["https://www.youtube.com/watch*"],
+  "host_permissions": ["https://*.youtube.com/*"],
   "background": {
     "service_worker": "background.js"
   },
@@ -21,7 +21,7 @@
 
   "content_scripts": [
     {
-      "matches": ["https://www.youtube.com/watch*"],
+      "matches": ["https://*.youtube.com/*"],
       "js": ["content-script.js"]
     }
   ],
@@ -34,7 +34,7 @@
         "assets/delete.png",
         "assets/save.png"
       ],
-      "matches": ["https://www.youtube.com/*"]
+      "matches": ["https://*.youtube.com/*"]
     }
   ]
 }
