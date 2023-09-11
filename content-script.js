@@ -3,7 +3,6 @@
   let currentVideo = "";
   let currentVideoBookmarks = [];
   let paragraph, title;
-  
 
   const fetchBookmarks = async () => {
     const obj = await chrome.storage.sync.get([currentVideo]);
@@ -32,45 +31,66 @@
 
   const getSummary = async () => {
     console.log("j'ai cliqué");
-    
-    if(!paragraph){
-      const url = 'https://youtube-summary-multilanguage.p.rapidapi.com/summarize/long/gpt-3.5-turbo-16k';
-      const description = document.getElementsByClassName("ytd-watch-metadata")[16];
+
+    if (!paragraph) {
+      const url =
+        "https://youtube-summary-multilanguage.p.rapidapi.com/summarize/long/gpt-3.5-turbo";
+      const description =
+        document.getElementsByClassName("ytd-watch-metadata")[16];
       paragraph = document.createElement("p");
       title = document.createElement("h2");
-     title.innerHTML = "Summary:";
+      title.innerHTML = "Summary:";
 
-     
-const options = {
-	method: 'POST',
-	headers: {
-		'content-type': 'application/json',
-		'X-RapidAPI-Key': '18d47ce013msh8fc068761e3c75fp1440cajsnd3095daa840a',
-		'X-RapidAPI-Host': 'youtube-summary-multilanguage.p.rapidapi.com'
-	},
-	body: {
-		url: window.location.href,
-		lang: 'en'
-	}
-};
+      const options = {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "X-RapidAPI-Key":
+            "953d53dcfcmshb4c036c7d51b56ap15acbejsn396576a98967",
+          "X-RapidAPI-Host": "youtube-summary-multilanguage.p.rapidapi.com",
+        },
+        body: JSON.stringify({
+          url: window.location.href,
+          lang: "fr",
+        }),
+      };
 
-try {
-	const response = await fetch(url, options);
-  console.log(response);
-	const result = await response.text();
-	console.log(result);
-  paragraph.innerHTML = result;
-  description.append(title, paragraph);
-  description.style.display = "block";
-} catch (error) {
-	console.error(error);
-}
-   
- 
+      // fetch(
+      //   "https://youtube-summary-multilanguage.p.rapidapi.com/summarize/long/gpt-3.5-turbo-16k",
+      //   {
+      //     method: "POST",
+      //     headers: {
+      //       "content-type": "application/json",
+      //       "X-RapidAPI-Key":
+      //         "953d53dcfcmshb4c036c7d51b56ap15acbejsn396576a98967",
+      //       "X-RapidAPI-Host": "youtube-summary-multilanguage.p.rapidapi.com",
+      //     },
+      //     mode: "cors",
+      //     cache: "default",
+      //     credentials: "same-origin",
+      //   }
+      // )
+      //   .then((response) => response.json())
+      //   .then((data) => console.log("data: ", data))
+      //   .catch((error) => console.log(error.message));
+
+      try {
+        const response = await fetch(url, options);
+        console.log(response, options);
+        const result = await response.text();
+        const parseResult = JSON.parse(result);
+        console.log(parseResult);
+        console.log(parseResult.summary.text);
+        paragraph.innerHTML = parseResult.summary.text.split("Summary:")[1]
+          ? parseResult.summary.text.split("Summary:")[1]
+          : parseResult.summary.text;
+        description.append(title, paragraph);
+        description.style.display = "block";
+      } catch (error) {
+        console.error(error);
+      }
     }
-    
-
-  }
+  };
 
   const newVideoLoaded = async () => {
     const bookmarkBtnExists =
@@ -84,7 +104,7 @@ try {
       bookmarkBtn.src = chrome.runtime.getURL("assets/bookmark.png");
       bookmarkBtn.className = "ytp-button " + "bookmark-btn";
       bookmarkBtn.title = "Click to bookmark current timestamp";
-    
+
       youtubeLeftControls =
         document.getElementsByClassName("ytp-left-controls")[0];
       youtubePlayer = document.getElementsByClassName("video-stream")[0];
@@ -95,52 +115,57 @@ try {
     }
     console.log(bookmarkBtnExists, "create");
 
-    const summarizeBtnExists = 
-    document.getElementsByClassName("summarize-btn")[0];
-    if(!summarizeBtnExists){
+    const summarizeBtnExists =
+      document.getElementsByClassName("summarize-btn")[0];
+    if (!summarizeBtnExists) {
       const summarizeBtn = document.createElement("button");
       summarizeBtn.className = "ytp-button " + "summarize-btn";
       summarizeBtn.innerText = "Summarize";
 
-    youtubeLeftControls.append(summarizeBtn);
-    summarizeBtn.style.width="80px"
-    summarizeBtn.style.borderRadius = "40px"
-    summarizeBtn.style.height = "35px"
-    summarizeBtn.style.backgroundColor = "white"
-    summarizeBtn.style.color = "black"
-    summarizeBtn.style.marginTop = "8px"
-    summarizeBtn.style.fontSize = "bold"
-    
+      youtubeLeftControls.append(summarizeBtn);
+      summarizeBtn.style.width = "80px";
+      summarizeBtn.style.borderRadius = "40px";
+      summarizeBtn.style.height = "35px";
+      summarizeBtn.style.backgroundColor = "white";
+      summarizeBtn.style.color = "black";
+      summarizeBtn.style.marginTop = "8px";
+      summarizeBtn.style.fontSize = "bold";
+
       summarizeBtn.addEventListener("click", getSummary);
     }
   };
 
-  chrome.runtime.onMessage.addListener(async(obj, sender, response) => {
+  chrome.runtime.onMessage.addListener(async (obj, sender, response) => {
     const { type, value, videoId } = obj;
-console.log(1);
+    console.log(1);
     if (type === "NEW") {
-    
       currentVideo = videoId;
       newVideoLoaded();
     } else if (type === "PLAY") {
-      youtubePlayer.currentTime = value;}
-      else if ( type === "DELETE") {
+      youtubePlayer.currentTime = value;
+    } else if (type === "DELETE") {
+      currentVideoBookmarks = await fetchBookmarks();
+      console.log(currentVideoBookmarks);
+      currentVideoBookmarks = currentVideoBookmarks.filter(
+        (b) => b.time != value
+      );
+      chrome.storage.sync.set({
+        [currentVideo]: JSON.stringify(currentVideoBookmarks),
+      });
 
-    currentVideoBookmarks = await fetchBookmarks();
-        console.log(currentVideoBookmarks);
-        currentVideoBookmarks = currentVideoBookmarks.filter((b) => b.time != value);
-        chrome.storage.sync.set({ [currentVideo]: JSON.stringify(currentVideoBookmarks) });
-  
-        response(currentVideoBookmarks);
-      }
+      response(currentVideoBookmarks);
+    }
   });
 
-  let trail="&ytExt=ON";
-  if(!window.location.href.includes(trail)&&!window.location.href.includes("ab_channel")&&window.location.href.includes("youtube.com/watch")){
-   
-          const new_URL = window.href+trail;
-          window.history.pushState({},"", new_URL);
-     }
+  let trail = "&ytExt=ON";
+  if (
+    !window.location.href.includes(trail) &&
+    !window.location.href.includes("ab_channel") &&
+    window.location.href.includes("youtube.com/watch")
+  ) {
+    const new_URL = window.href + trail;
+    window.history.pushState({}, "", new_URL);
+  }
 })();
 
 const getTime = (t) => {
