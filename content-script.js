@@ -38,11 +38,10 @@
     if (!bookmarkBtnExists) {
       console.log("doesnt exist");
       const bookmarkBtn = document.createElement("img");
-
       bookmarkBtn.src = chrome.runtime.getURL("assets/bookmark.png");
       bookmarkBtn.className = "ytp-button " + "bookmark-btn";
       bookmarkBtn.title = "Click to bookmark current timestamp";
-
+    
       youtubeLeftControls =
         document.getElementsByClassName("ytp-left-controls")[0];
       youtubePlayer = document.getElementsByClassName("video-stream")[0];
@@ -52,6 +51,24 @@
       bookmarkBtn.addEventListener("click", addNewBookmarkEventHandler);
     }
     console.log(bookmarkBtnExists, "create");
+
+    const summarizeBtnExists = 
+    document.getElementsByClassName("summarize-btn")[0];
+    if(!summarizeBtnExists){
+      const summarizeBtn = document.createElement("button");
+      summarizeBtn.className = "ytp-button " + "summarize-btn";
+      summarizeBtn.innerText = "Summarize";
+
+    youtubeLeftControls.append(summarizeBtn);
+    summarizeBtn.style.width="80px"
+    summarizeBtn.style.borderRadius = "40px"
+    summarizeBtn.style.height = "35px"
+    summarizeBtn.style.backgroundColor = "white"
+    summarizeBtn.style.color = "black"
+    summarizeBtn.style.marginTop = "8px"
+    summarizeBtn.style.fontSize = "bold"
+    
+    }
   };
 
   chrome.runtime.onMessage.addListener(async(obj, sender, response) => {
