@@ -59,7 +59,8 @@ const viewBookmarks = (currentBookmarks=[]) => {
     chrome.tabs.sendMessage(activeTab.id, {
       type: "DELETE",
       value: bookmarkTime,
-    }, viewBookmarks);
+    },);
+
   };
 
 const setBookmarkAttributes =  (src, eventListener, controlParentElement) => {
