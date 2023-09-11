@@ -2,6 +2,7 @@
   let youtubeLeftControls, youtubePlayer;
   let currentVideo = "";
   let currentVideoBookmarks = [];
+  let paragraph, title;
   
 
   const fetchBookmarks = async () => {
@@ -31,13 +32,44 @@
 
   const getSummary = async () => {
     console.log("j'ai cliqué");
-    const description = document.getElementsByClassName("ytd-watch-metadata")[16];
-    const paragraph = document.createElement("p");
-    const title = document.createElement("h2");
-    title.innerHTML = "Summary:";
-    paragraph.innerHTML = "lorem ipsum";
-    description.append(title, paragraph);
-    description.style.display = "block";
+    
+    if(!paragraph){
+      const url = 'https://youtube-summary-multilanguage.p.rapidapi.com/summarize/long/gpt-3.5-turbo-16k';
+      const description = document.getElementsByClassName("ytd-watch-metadata")[16];
+      paragraph = document.createElement("p");
+      title = document.createElement("h2");
+     title.innerHTML = "Summary:";
+
+     
+const options = {
+	method: 'POST',
+	headers: {
+		'content-type': 'application/json',
+		'X-RapidAPI-Key': '18d47ce013msh8fc068761e3c75fp1440cajsnd3095daa840a',
+		'X-RapidAPI-Host': 'youtube-summary-multilanguage.p.rapidapi.com'
+	},
+	body: {
+		url: window.location.href,
+		lang: 'en'
+	}
+};
+
+try {
+	const response = await fetch(url, options);
+  console.log(response);
+	const result = await response.text();
+	console.log(result);
+  paragraph.innerHTML = result;
+  description.append(title, paragraph);
+  description.style.display = "block";
+} catch (error) {
+	console.error(error);
+}
+   
+ 
+    }
+    
+
   }
 
   const newVideoLoaded = async () => {
