@@ -29,6 +29,17 @@
     });
   };
 
+  const getSummary = async () => {
+    console.log("j'ai cliqué");
+    const description = document.getElementsByClassName("ytd-watch-metadata")[16];
+    const paragraph = document.createElement("p");
+    const title = document.createElement("h2");
+    title.innerHTML = "Summary:";
+    paragraph.innerHTML = "lorem ipsum";
+    description.append(title, paragraph);
+    description.style.display = "block";
+  }
+
   const newVideoLoaded = async () => {
     const bookmarkBtnExists =
       document.getElementsByClassName("bookmark-btn")[0];
@@ -68,6 +79,7 @@
     summarizeBtn.style.marginTop = "8px"
     summarizeBtn.style.fontSize = "bold"
     
+      summarizeBtn.addEventListener("click", getSummary);
     }
   };
 
