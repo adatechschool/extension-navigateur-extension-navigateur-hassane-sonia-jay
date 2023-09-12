@@ -4,6 +4,7 @@
   let currentVideoBookmarks = [];
   let paragraph, title;
   let lang = "fr";
+  let loading = false;
 
   const fetchBookmarks = async () => {
     const obj = await chrome.storage.sync.get([currentVideo]);
@@ -22,11 +23,15 @@
     console.log("bookmark= ", newBookmark);
 
     currentVideoBookmarks = await fetchBookmarks();
-    const bookmarkAlreadyExists = currentVideoBookmarks.find((bookmark) => bookmark.time === newBookmark.time);
+    const bookmarkAlreadyExists = currentVideoBookmarks.find(
+      (bookmark) => bookmark.time === newBookmark.time
+    );
     if (!bookmarkAlreadyExists) {
       chrome.storage.sync.set({
         [currentVideo]: JSON.stringify(
-          [...currentVideoBookmarks, newBookmark].sort((a, b) => a.time - b.time)
+          [...currentVideoBookmarks, newBookmark].sort(
+            (a, b) => a.time - b.time
+          )
         ),
       });
     }
@@ -35,10 +40,14 @@
 
   const getSummary = async () => {
     console.log("j'ai cliqué");
+    const summarizeBtn = document.getElementsByClassName("summarize-btn")[0];
+    summarizeBtn.style.display = "none";
+    const loader = document.getElementsByClassName("loader")[0];
+    loader.style.display = "inline";
 
     if (!paragraph) {
       const url =
-        "https://youtube-summary-multilanguage.p.rapidapi.com/summarize/long/gpt-3.5-turbo";
+        "https://youtube-summary-multilanguage.p.rapidapi.com/summarize/long/gpt-3.5-turbo-16k";
       const description =
         document.getElementsByClassName("ytd-watch-metadata")[16];
       paragraph = document.createElement("p");
@@ -63,24 +72,35 @@
         const response = await fetch(url, options);
         console.log(response, options);
         const result = await response.text();
+        summarizeBtn.style.display = "flex";
+        loader.style.display = "none";
         const parseResult = JSON.parse(result);
         console.log(parseResult);
         console.log(parseResult.error);
-          if(parseResult.error === "It's not possible to make a summary for this video because it doesn't have a transcript") {
-            alert(parseResult.error);
-          } else if (parseResult.error !== null) {
-            alert("Something went wrong, please try again later !")
-          }
-          
-          if(parseResult.summary) {
-            paragraph.innerHTML = parseResult.summary.text.split("Summary:")[1]
-          ? parseResult.summary.text.split("Summary:")[1]
-          : parseResult.summary.text;
-        description.append(title, paragraph);
-        description.style.display = "block";
-          }
-        
+        if (
+          parseResult.error ===
+          "It's not possible to make a summary for this video because it doesn't have a transcript"
+        ) {
+          alert(parseResult.error);
+        } else if (parseResult.error !== null) {
+          alert("Something went wrong, please try again later !");
+        }
+
+        if (parseResult.summary) {
+          paragraph.innerHTML = parseResult.summary.text.split("Summary:")[1]
+            ? parseResult.summary.text.split("Summary:")[1]
+            : parseResult.summary.text;
+          paragraph.style.fontSize = "16px";
+          paragraph.style.backgroundColor = "#f5002b5e";
+          paragraph.style.padding = "10px";
+          paragraph.style.borderRadius = "15px";
+          paragraph.style.marginTop = "5px";
+          description.append(title, paragraph);
+          description.style.display = "block";
+        }
       } catch (error) {
+        summarizeBtn.style.display = "flex";
+        loader.style.display = "none";
         console.log(error.message);
         console.error(error);
       }
@@ -88,8 +108,6 @@
   };
 
   const newVideoLoaded = async () => {
-  
-
     const bookmarkBtnExists =
       document.getElementsByClassName("bookmark-btn")[0];
 
@@ -111,7 +129,7 @@
       bookmarkBtn.addEventListener("click", addNewBookmarkEventHandler);
     }
     console.log(bookmarkBtnExists, "create");
-   
+
     const summarizeBtnExists =
       document.getElementsByClassName("summarize-btn")[0];
     if (!summarizeBtnExists) {
@@ -135,36 +153,44 @@
       summarizeBtn.addEventListener("click", getSummary);
     }
 
-    const selectInputExists = document.getElementsByClassName("languagesOptions");
+    const loadingSpanExists = document.getElementsByClassName("loader");
+    if (loadingSpanExists.length === 0) {
+      const loader = document.createElement("span");
+      loader.className = "loader";
+      loader.style.color = "#fff";
+      loader.style.fontSize = "10px";
+      loader.innerText = "dfsfsdfsd";
+      loader.style.display = "none";
+      youtubeLeftControls.append(loader);
+    }
+
+    const selectInputExists =
+      document.getElementsByClassName("languagesOptions");
     console.log("ok", selectInputExists);
-    if(selectInputExists.length === 0){
-   const languageList = document.createElement("select");
-   console.log(languageList);
-   languageList.className = "languagesOptions";
-   languageList.style.height = "40px";
-   languageList.style.marginTop = "5px";
-   languageList.style.borderRadius = "5px";
-   languageList.style.fontWeight = "bold";
-   languageList.style.fontSize = "16px";
-   const arrayOfLanguages = ["fr", "en", "de", "it", "es", "zh"];
-   for(const language of arrayOfLanguages){
-
-     const option = document.createElement("option");
-     if(language === "zh-Hans"){
-      option.text = "cn";
-     }else{
-      option.text = language;
-     }
-          option.value = language;
-          languageList.append(option);   
-          
-            
+    if (selectInputExists.length === 0) {
+      const languageList = document.createElement("select");
+      console.log(languageList);
+      languageList.className = "languagesOptions";
+      languageList.style.height = "40px";
+      languageList.style.marginTop = "5px";
+      languageList.style.borderRadius = "5px";
+      languageList.style.fontWeight = "bold";
+      languageList.style.fontSize = "16px";
+      const arrayOfLanguages = ["fr", "en", "de", "it", "es", "zh"];
+      for (const language of arrayOfLanguages) {
+        const option = document.createElement("option");
+        if (language === "zh-Hans") {
+          option.text = "cn";
+        } else {
+          option.text = language;
         }
-    youtubeLeftControls.append(languageList);
-    languageList.addEventListener('change', (e)=>{
-    lang= e.target.value;
-
-    })
+        option.value = language;
+        languageList.append(option);
+      }
+      youtubeLeftControls.append(languageList);
+      languageList.addEventListener("change", (e) => {
+        lang = e.target.value;
+      });
     }
   };
 
