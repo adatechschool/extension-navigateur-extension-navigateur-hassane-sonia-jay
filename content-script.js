@@ -3,6 +3,7 @@
   let currentVideo = "";
   let currentVideoBookmarks = [];
   let paragraph, title;
+  let lang = "fr";
 
   const fetchBookmarks = async () => {
     const obj = await chrome.storage.sync.get([currentVideo]);
@@ -23,7 +24,6 @@
     currentVideoBookmarks = await fetchBookmarks();
     const bookmarkAlreadyExists = currentVideoBookmarks.find((bookmark) => bookmark.time === newBookmark.time);
     if (!bookmarkAlreadyExists) {
-      window.open("./popup.html")
       chrome.storage.sync.set({
         [currentVideo]: JSON.stringify(
           [...currentVideoBookmarks, newBookmark].sort((a, b) => a.time - b.time)
@@ -50,12 +50,12 @@
         headers: {
           "content-type": "application/json",
           "X-RapidAPI-Key":
-            "953d53dcfcmshb4c036c7d51b56ap15acbejsn396576a98967",
+            "bb7644f4camsh704f7d5613a7768p12b59bjsn15758ea5893b",
           "X-RapidAPI-Host": "youtube-summary-multilanguage.p.rapidapi.com",
         },
         body: JSON.stringify({
           url: window.location.href,
-          lang: "fr",
+          lang,
         }),
       };
 
@@ -88,14 +88,7 @@
   };
 
   const newVideoLoaded = async () => {
-  const inputExists = document.getElementsByClassName("bookmark-title")[0];
-  if(!inputExists){
-    const bookmarkInput = document.createElement("input");
-    bookmarkInput.className = "bookmark-title";
   
-  }
-  
-
 
     const bookmarkBtnExists =
       document.getElementsByClassName("bookmark-btn")[0];
@@ -118,13 +111,7 @@
       bookmarkBtn.addEventListener("click", addNewBookmarkEventHandler);
     }
     console.log(bookmarkBtnExists, "create");
-    if(!inputExists){
-      const bookmarkInput = document.createElement("input");
-      bookmarkInput.className = "ytd-searchbox " + "bookmark-title";
-      bookmarkInput.type  = "text";
-    youtubeLeftControls.append(bookmarkInput);
-
-    }
+   
     const summarizeBtnExists =
       document.getElementsByClassName("summarize-btn")[0];
     if (!summarizeBtnExists) {
@@ -146,6 +133,38 @@
       summarizeBtn.style.alignItems = "center";
 
       summarizeBtn.addEventListener("click", getSummary);
+    }
+
+    const selectInputExists = document.getElementsByClassName("languagesOptions");
+    console.log("ok", selectInputExists);
+    if(selectInputExists.length === 0){
+   const languageList = document.createElement("select");
+   console.log(languageList);
+   languageList.className = "languagesOptions";
+   languageList.style.height = "40px";
+   languageList.style.marginTop = "5px";
+   languageList.style.borderRadius = "5px";
+   languageList.style.fontWeight = "bold";
+   languageList.style.fontSize = "16px";
+   const arrayOfLanguages = ["fr", "en", "de", "it", "es", "zh"];
+   for(const language of arrayOfLanguages){
+
+     const option = document.createElement("option");
+     if(language === "zh-Hans"){
+      option.text = "cn";
+     }else{
+      option.text = language;
+     }
+          option.value = language;
+          languageList.append(option);   
+          
+            
+        }
+    youtubeLeftControls.append(languageList);
+    languageList.addEventListener('change', (e)=>{
+    lang= e.target.value;
+
+    })
     }
   };
 
