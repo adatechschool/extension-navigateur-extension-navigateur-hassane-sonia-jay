@@ -95,7 +95,7 @@
     if (!bookmarkBtnExists) {
       console.log("doesnt exist");
       const bookmarkBtn = document.createElement("img");
-      bookmarkBtn.src = chrome.runtime.getURL("assets/bookmark.png");
+      bookmarkBtn.src = chrome.runtime.getURL("assets/pin.png");
       bookmarkBtn.className = "ytp-button " + "bookmark-btn";
       bookmarkBtn.title = "Click to bookmark current timestamp";
 
@@ -119,11 +119,15 @@
       youtubeLeftControls.append(summarizeBtn);
       summarizeBtn.style.width = "80px";
       summarizeBtn.style.borderRadius = "40px";
-      summarizeBtn.style.height = "35px";
+      summarizeBtn.style.height = "30px";
       summarizeBtn.style.backgroundColor = "white";
       summarizeBtn.style.color = "black";
-      summarizeBtn.style.marginTop = "8px";
-      summarizeBtn.style.fontSize = "bold";
+      summarizeBtn.style.marginTop = "10px";
+      summarizeBtn.style.fontWeight = "bold";
+      summarizeBtn.style.fontSize = "12px";
+      summarizeBtn.style.display = "flex";
+      summarizeBtn.style.justifyContent = "center";
+      summarizeBtn.style.alignItems = "center";
 
       summarizeBtn.addEventListener("click", getSummary);
     }
