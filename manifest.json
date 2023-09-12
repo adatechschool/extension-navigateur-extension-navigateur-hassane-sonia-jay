@@ -13,10 +13,16 @@
       "16": "assets/icon-notepad.png",
       "24": "assets/icon-notepad.png",
       "32": "assets/icon-notepad.png",
-      "48": "assets/icon-notepad.png"
+      "48": "assets/icon-notepad.png",
+      "128": "assets/icon-notepad.png" 
     },
+  
     "default_title": "Youtube bookmarks and multi-lingual summary",
     "default_popup": "popup.html"
+  },
+
+  "icons": {
+    "128": "assets/icon-notepad.png"
   },
 
   "content_scripts": [

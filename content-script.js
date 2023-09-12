@@ -21,12 +21,15 @@
     console.log("bookmark= ", newBookmark);
 
     currentVideoBookmarks = await fetchBookmarks();
+    const bookmarkAlreadyExists = currentVideoBookmarks.find((bookmark) => bookmark.time === newBookmark.time);
+    if (!bookmarkAlreadyExists) {
+      chrome.storage.sync.set({
+        [currentVideo]: JSON.stringify(
+          [...currentVideoBookmarks, newBookmark].sort((a, b) => a.time - b.time)
+        ),
+      });
+    }
     console.log(currentVideo);
-    chrome.storage.sync.set({
-      [currentVideo]: JSON.stringify(
-        [...currentVideoBookmarks, newBookmark].sort((a, b) => a.time - b.time)
-      ),
-    });
   };
 
   const getSummary = async () => {
@@ -55,38 +58,29 @@
         }),
       };
 
-      // fetch(
-      //   "https://youtube-summary-multilanguage.p.rapidapi.com/summarize/long/gpt-3.5-turbo-16k",
-      //   {
-      //     method: "POST",
-      //     headers: {
-      //       "content-type": "application/json",
-      //       "X-RapidAPI-Key":
-      //         "953d53dcfcmshb4c036c7d51b56ap15acbejsn396576a98967",
-      //       "X-RapidAPI-Host": "youtube-summary-multilanguage.p.rapidapi.com",
-      //     },
-      //     mode: "cors",
-      //     cache: "default",
-      //     credentials: "same-origin",
-      //   }
-      // )
-      //   .then((response) => response.json())
-      //   .then((data) => console.log("data: ", data))
-      //   .catch((error) => console.log(error.message));
-
       try {
         const response = await fetch(url, options);
         console.log(response, options);
         const result = await response.text();
         const parseResult = JSON.parse(result);
         console.log(parseResult);
-        console.log(parseResult.summary.text);
-        paragraph.innerHTML = parseResult.summary.text.split("Summary:")[1]
+        console.log(parseResult.error);
+          if(parseResult.error === "It's not possible to make a summary for this video because it doesn't have a transcript") {
+            alert(parseResult.error);
+          } else if (parseResult.error !== null) {
+            alert("Something went wrong, please try again later !")
+          }
+          
+          if(parseResult.summary) {
+            paragraph.innerHTML = parseResult.summary.text.split("Summary:")[1]
           ? parseResult.summary.text.split("Summary:")[1]
           : parseResult.summary.text;
         description.append(title, paragraph);
         description.style.display = "block";
+          }
+        
       } catch (error) {
+        console.log(error.message);
         console.error(error);
       }
     }
