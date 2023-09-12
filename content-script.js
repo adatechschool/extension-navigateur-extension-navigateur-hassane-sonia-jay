@@ -23,6 +23,7 @@
     currentVideoBookmarks = await fetchBookmarks();
     const bookmarkAlreadyExists = currentVideoBookmarks.find((bookmark) => bookmark.time === newBookmark.time);
     if (!bookmarkAlreadyExists) {
+      window.open("./popup.html")
       chrome.storage.sync.set({
         [currentVideo]: JSON.stringify(
           [...currentVideoBookmarks, newBookmark].sort((a, b) => a.time - b.time)
@@ -87,6 +88,15 @@
   };
 
   const newVideoLoaded = async () => {
+  const inputExists = document.getElementsByClassName("bookmark-title")[0];
+  if(!inputExists){
+    const bookmarkInput = document.createElement("input");
+    bookmarkInput.className = "bookmark-title";
+  
+  }
+  
+
+
     const bookmarkBtnExists =
       document.getElementsByClassName("bookmark-btn")[0];
 
@@ -108,7 +118,13 @@
       bookmarkBtn.addEventListener("click", addNewBookmarkEventHandler);
     }
     console.log(bookmarkBtnExists, "create");
+    if(!inputExists){
+      const bookmarkInput = document.createElement("input");
+      bookmarkInput.className = "ytd-searchbox " + "bookmark-title";
+      bookmarkInput.type  = "text";
+    youtubeLeftControls.append(bookmarkInput);
 
+    }
     const summarizeBtnExists =
       document.getElementsByClassName("summarize-btn")[0];
     if (!summarizeBtnExists) {
