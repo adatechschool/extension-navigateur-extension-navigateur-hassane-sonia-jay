@@ -47,7 +47,7 @@
 
     if (!paragraph) {
       const url =
-        "https://youtube-summary-multilanguage.p.rapidapi.com/summarize/long/gpt-3.5-turbo-16k";
+        "https://youtube-summary-multilanguage.p.rapidapi.com/summarize/long/gpt-3.5-turbo";
       const description =
         document.getElementsByClassName("ytd-watch-metadata")[16];
       paragraph = document.createElement("p");
@@ -59,7 +59,7 @@
         headers: {
           "content-type": "application/json",
           "X-RapidAPI-Key":
-            "bb7644f4camsh704f7d5613a7768p12b59bjsn15758ea5893b",
+            "81f3c54c74msh1cc7eeb18af127cp12b374jsnec21c26dd53c",
           "X-RapidAPI-Host": "youtube-summary-multilanguage.p.rapidapi.com",
         },
         body: JSON.stringify({
@@ -157,10 +157,54 @@
     if (loadingSpanExists.length === 0) {
       const loader = document.createElement("span");
       loader.className = "loader";
-      loader.style.color = "#fff";
-      loader.style.fontSize = "10px";
-      loader.innerText = "dfsfsdfsd";
-      loader.style.display = "none";
+      // Define the CSS code as a string
+const cssCode = `
+.loader {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    position: relative;
+    animation: rotate 5s linear infinite;
+}
+
+.loader::before, .loader::after {
+    content: "";
+    box-sizing: border-box;
+    position: absolute;
+    inset: 0px;
+    border-radius: 50%;
+    border: 5px solid #FFF;
+    animation: prixClipFix 2.5s ease-in-out infinite;
+}
+
+.loader::after {
+    border-color: #FF3D00;
+    animation: prixClipFix 2.5s linear infinite, rotate 1s linear infinite reverse;
+    inset: 6px;
+}
+
+@keyframes rotate {
+    0% { transform: rotate(0deg) }
+    100% { transform: rotate(360deg) }
+}
+
+@keyframes prixClipFix {
+    0% { clip-path: polygon(50% 50%, 0 0, 0 0, 0 0, 0 0, 0 0) }
+    25% { clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 0, 100% 0, 100% 0) }
+    50% { clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 100% 100%, 100% 100%) }
+    75% { clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 0 100%, 0 100%) }
+    100% { clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 0 100%, 0 0) }
+}
+`;
+
+// Create a <style> element and set its content to the CSS code
+const styleElement = document.createElement('style');
+styleElement.textContent = cssCode;
+
+// Append the <style> element to the <head> of the document
+document.head.appendChild(styleElement);
+
+      // loader.style.display = "none";
       youtubeLeftControls.append(loader);
     }
 
