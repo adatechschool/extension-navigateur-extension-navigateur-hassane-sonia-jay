@@ -1,5 +1,5 @@
 body {
-  background-color: pink;
+  background-color: rgb(237, 234, 234);
 }
 
 .container {
@@ -46,7 +46,7 @@ body {
   box-shadow: 0 4px 8px rgba(0,0,0,.3);
   justify-content: center;
   align-items: center;
-  background-color: rgb(243, 243, 42);
+  background-color: grey;
   border: none;
 }
 

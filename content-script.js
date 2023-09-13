@@ -4,7 +4,6 @@
   let currentVideoBookmarks = [];
   let paragraph, title;
   let lang = "fr";
-  let loading = false;
 
   const fetchBookmarks = async () => {
     const obj = await chrome.storage.sync.get([currentVideo]);
@@ -12,20 +11,18 @@
   };
 
   const addNewBookmarkEventHandler = async () => {
-    console.log("u clickd");
     const currentTime = youtubePlayer.currentTime;
-    console.log("time= ", currentTime);
     const newBookmark = {
       time: currentTime,
       desc: "Bookmark at " + getTime(currentTime),
     };
 
-    console.log("bookmark= ", newBookmark);
-
     currentVideoBookmarks = await fetchBookmarks();
+    // on vérifie si le bookmark existe déjà. S'il existe, il retoune le bookmark. S'il n'existe pas, ça retourne "undefined".
     const bookmarkAlreadyExists = currentVideoBookmarks.find(
       (bookmark) => bookmark.time === newBookmark.time
     );
+    // si le bookmark n'existe pas, on le stocke dans le chrome.storage.
     if (!bookmarkAlreadyExists) {
       chrome.storage.sync.set({
         [currentVideo]: JSON.stringify(
@@ -35,14 +32,14 @@
         ),
       });
     }
-    console.log(currentVideo);
   };
 
   const getSummary = async () => {
-    console.log("j'ai cliqué");
     const summarizeBtn = document.getElementsByClassName("summarize-btn")[0];
+    // disparition du bouton "summarize" au clic.
     summarizeBtn.style.display = "none";
     const loader = document.getElementsByClassName("loader")[0];
+    // fait apparaître le loader quand on clic sur "summarize"
     loader.style.display = "inline";
 
     if (!paragraph) {
@@ -70,13 +67,12 @@
 
       try {
         const response = await fetch(url, options);
-        console.log(response, options);
         const result = await response.text();
+        // ré-affichage du bouton "Summarize" quand la requête a abouti.
         summarizeBtn.style.display = "flex";
         loader.style.display = "none";
         const parseResult = JSON.parse(result);
-        console.log(parseResult);
-        console.log(parseResult.error);
+
         if (
           parseResult.error ===
           "It's not possible to make a summary for this video because it doesn't have a transcript"
@@ -87,6 +83,7 @@
         }
 
         if (parseResult.summary) {
+          // condition ternaire vérifiant la présence du mot "summary" dans le retour de la requête. 
           paragraph.innerHTML = parseResult.summary.text.split("Summary:")[1]
             ? parseResult.summary.text.split("Summary:")[1]
             : parseResult.summary.text;
@@ -101,8 +98,6 @@
       } catch (error) {
         summarizeBtn.style.display = "flex";
         loader.style.display = "none";
-        console.log(error.message);
-        console.error(error);
       }
     }
   };
@@ -112,9 +107,7 @@
       document.getElementsByClassName("bookmark-btn")[0];
 
     currentVideoBookmarks = await fetchBookmarks();
-    console.log(bookmarkBtnExists);
     if (!bookmarkBtnExists) {
-      console.log("doesnt exist");
       const bookmarkBtn = document.createElement("img");
       bookmarkBtn.src = chrome.runtime.getURL("assets/pin.png");
       bookmarkBtn.className = "ytp-button " + "bookmark-btn";
@@ -123,12 +116,10 @@
       youtubeLeftControls =
         document.getElementsByClassName("ytp-left-controls")[0];
       youtubePlayer = document.getElementsByClassName("video-stream")[0];
-      console.log(youtubePlayer.currentTime);
       youtubeLeftControls.append(bookmarkBtn);
 
       bookmarkBtn.addEventListener("click", addNewBookmarkEventHandler);
     }
-    console.log(bookmarkBtnExists, "create");
 
     const summarizeBtnExists =
       document.getElementsByClassName("summarize-btn")[0];
@@ -153,8 +144,8 @@
       summarizeBtn.addEventListener("click", getSummary);
     }
 
-    const loadingSpanExists = document.getElementsByClassName("loader");
-    if (loadingSpanExists.length === 0) {
+    const loadingSpanExists = document.getElementsByClassName("loader")[0];
+    if (!loadingSpanExists) {
       const loader = document.createElement("span");
       loader.className = "loader";
       // Define the CSS code as a string
@@ -209,11 +200,9 @@ document.head.appendChild(styleElement);
     }
 
     const selectInputExists =
-      document.getElementsByClassName("languagesOptions");
-    console.log("ok", selectInputExists);
-    if (selectInputExists.length === 0) {
+      document.getElementsByClassName("languagesOptions")[0];
+    if (!selectInputExists) {
       const languageList = document.createElement("select");
-      console.log(languageList);
       languageList.className = "languagesOptions";
       languageList.style.height = "40px";
       languageList.style.marginTop = "5px";
@@ -223,7 +212,7 @@ document.head.appendChild(styleElement);
       const arrayOfLanguages = ["fr", "en", "de", "it", "es", "zh"];
       for (const language of arrayOfLanguages) {
         const option = document.createElement("option");
-        if (language === "zh-Hans") {
+        if (language === "zh") {
           option.text = "cn";
         } else {
           option.text = language;
@@ -240,7 +229,6 @@ document.head.appendChild(styleElement);
 
   chrome.runtime.onMessage.addListener(async (obj, sender, response) => {
     const { type, value, videoId } = obj;
-    console.log(1);
     if (type === "NEW") {
       currentVideo = videoId;
       newVideoLoaded();
@@ -248,7 +236,6 @@ document.head.appendChild(styleElement);
       youtubePlayer.currentTime = value;
     } else if (type === "DELETE") {
       currentVideoBookmarks = await fetchBookmarks();
-      console.log(currentVideoBookmarks);
       currentVideoBookmarks = currentVideoBookmarks.filter(
         (b) => b.time != value
       );
@@ -256,7 +243,6 @@ document.head.appendChild(styleElement);
         [currentVideo]: JSON.stringify(currentVideoBookmarks),
       });
 
-      response(currentVideoBookmarks);
     }
   });
 
