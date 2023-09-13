@@ -204,7 +204,7 @@ styleElement.textContent = cssCode;
 // Append the <style> element to the <head> of the document
 document.head.appendChild(styleElement);
 
-      // loader.style.display = "none";
+      loader.style.display = "none";
       youtubeLeftControls.append(loader);
     }
 
